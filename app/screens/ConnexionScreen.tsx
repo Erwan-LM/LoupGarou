@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import BackgroundImage from '../components/BackgroundImage';
 import Logo from '../components/Logo';
 import AnimatedTitle from '../components/AnimatedTitle';
-import Footer from '../components/Footer'; // Importation du Footer
+import Footer from '../components/Footer';
 
 const { width } = Dimensions.get('window');
 
@@ -19,85 +19,66 @@ const passwordRequirements = {
 const ConnexionScreen: React.FC = () => {
   const router = useRouter();
   const logo = require('../../assets/images/corne.png');
-  const backgroundImage = require('../../assets/images/dark-forest-background.jpg'); // Vérifiez que ce chemin est correct
+  const backgroundImage = require('../../assets/images/dark-forest-background.jpg');
   const productionText = "Production Pandemania";
 
-  // États pour gérer le formulaire
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [email, setEmail] = useState(''); // État pour l'e-mail
+  const [email, setEmail] = useState('');
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
-  const [loginError, setLoginError] = useState(false); // État pour gérer les erreurs de connexion
-  const [emailError, setEmailError] = useState(false); // État pour gérer les erreurs d'e-mail
-  const [passwordsMatchError, setPasswordsMatchError] = useState(false); // État pour les erreurs de correspondance des mots de passe
-  const [showConfirmation, setShowConfirmation] = useState(false); // État pour le pop-up de confirmation
+  const [loginError, setLoginError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordsMatchError, setPasswordsMatchError] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  // Fonction de gestion de la connexion
   const handleLogin = () => {
-    // Ici, vous devez ajouter la logique de vérification des identifiants
-    if (username !== "correctUsername" || password !== "correctPassword") {
-      // Afficher le pop-up d'erreur si les identifiants sont incorrects
+    if (username === "" || password === "") {
       setLoginError(true);
-      setTimeout(() => {
-        setLoginError(false); // Ferme le pop-up après 7 secondes
-        resetFields();
-      }, 7000);
+      setTimeout(() => setLoginError(false), 7000);
     } else {
-      router.push('/home'); // Logique de connexion ici
+      router.push('/home');
     }
   };
 
-  // Fonction de gestion de l'inscription
   const handleSignup = () => {
-    // Vérification des champs requis
     if (!username || !password || !confirmPassword || !email) {
       Alert.alert("Erreur", "Tous les champs sont requis.");
       return;
     }
 
-    // Vérification de la correspondance des mots de passe
     if (password !== confirmPassword) {
-      Alert.alert("Erreur", "Les mots de passe doivent correspondre.");
+      setPasswordsMatchError(true);
       return;
     }
 
-    // Validation de l'e-mail
     if (!validateEmail(email)) {
       setEmailError(true);
-      setTimeout(() => {
-        setEmailError(false);
-        resetFields();
-      }, 7000);
+      setTimeout(() => setEmailError(false), 7000);
       return;
     }
 
-    // Validation du mot de passe
     if (passwordError) {
       Alert.alert("Erreur", "Le mot de passe ne répond pas aux exigences.");
       return;
     }
 
-    // Afficher le pop-up de confirmation
     setShowConfirmation(true);
   };
 
-  // Fonction pour valider l'e-mail (simulation)
   const validateEmail = (input: string) => {
-    // Simulez la vérification d'un e-mail existant
-    const existingEmails = ["test@example.com", "user@example.com"]; // Remplacez par votre logique de vérification
-    return existingEmails.includes(input);
+    // Expression régulière simple pour valider un format d'e-mail
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(input); // Renvoie true si l'e-mail est valide
   };
+  
 
-  // Fonction de confirmation d'inscription
   const handleConfirmation = (isConfirmed: boolean) => {
     setShowConfirmation(false);
     if (isConfirmed) {
-      // Logique pour envoyer la confirmation par email
       Alert.alert('Inscription réussie', 'Un email de confirmation a été envoyé.');
-      // Réinitialiser les champs après l'inscription
       resetFields();
     }
   };
@@ -110,7 +91,6 @@ const ConnexionScreen: React.FC = () => {
     setIsSignup(false);
   };
 
-  // Fonction pour valider le mot de passe
   const validatePassword = (input: string) => {
     const isValid = input.length >= passwordRequirements.minLength &&
       passwordRequirements.uppercase.test(input) &&
@@ -120,14 +100,11 @@ const ConnexionScreen: React.FC = () => {
     setPasswordError(!isValid);
   };
 
-  // Fonction pour valider la correspondance des mots de passe
   useEffect(() => {
-    if (isSignup) {
-      if (confirmPassword.length > 0 && password !== confirmPassword) {
-        setPasswordsMatchError(true);
-      } else {
-        setPasswordsMatchError(false);
-      }
+    if (isSignup && password !== confirmPassword) {
+      setPasswordsMatchError(true);
+    } else {
+      setPasswordsMatchError(false);
     }
   }, [password, confirmPassword, isSignup]);
 
@@ -152,7 +129,6 @@ const ConnexionScreen: React.FC = () => {
       <View style={styles.formContainer}>
         <AnimatedTitle title="Loup Garou" />
 
-        {/* Champ de connexion */}
         <TextInput
           style={styles.input}
           placeholder="Nom d'utilisateur"
@@ -166,8 +142,7 @@ const ConnexionScreen: React.FC = () => {
           value={password}
           onChangeText={(text) => {
             setPassword(text);
-            if (text) setShowPasswordInfo(true);
-            else setShowPasswordInfo(false);
+            setShowPasswordInfo(!!text);
           }}
         />
 
@@ -183,14 +158,14 @@ const ConnexionScreen: React.FC = () => {
         {isSignup && (
           <>
             <TextInput
-              style={styles.input} // Utiliser le même style 'input' pour avoir la même taille
+              style={styles.input}
               placeholder="Confirmer le mot de passe"
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
             <TextInput
-              style={styles.input} // Utiliser le même style 'input' pour avoir la même taille
+              style={styles.input}
               placeholder="E-mail"
               value={email}
               onChangeText={setEmail}
@@ -211,13 +186,7 @@ const ConnexionScreen: React.FC = () => {
           </>
         )}
 
-        <TouchableOpacity style={styles.button} onPress={() => {
-          if (isSignup) {
-            handleSignup();
-          } else {
-            handleLogin();
-          }
-        }}>
+        <TouchableOpacity style={styles.button} onPress={isSignup ? handleSignup : handleLogin}>
           <Text style={styles.buttonText}>{isSignup ? "S'inscrire" : "Se connecter"}</Text>
         </TouchableOpacity>
 
@@ -232,7 +201,6 @@ const ConnexionScreen: React.FC = () => {
           </TouchableOpacity>
         </LinearGradient>
 
-        {/* Pop-up de confirmation d'inscription */}
         {showConfirmation && (
           <View style={styles.popup}>
             <Text style={styles.popupText}>Confirmez-vous votre inscription ?</Text>
@@ -247,7 +215,6 @@ const ConnexionScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Pop-up d'erreur de connexion */}
         {loginError && (
           <View style={styles.popup}>
             <Text style={styles.popupText}>Erreur de login et/ou mot de passe, veuillez recommencer.</Text>
@@ -257,8 +224,7 @@ const ConnexionScreen: React.FC = () => {
           </View>
         )}
       </View>
-
-      <Footer /> {/* Ajout du Footer */}
+      <Footer />
     </View>
   );
 };
@@ -267,6 +233,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1D1D1D',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   backgroundContainer: {
     flex: 1,
@@ -280,122 +248,91 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   formContainer: {
-    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 20,
-    zIndex: 1, // S'assurer que le formulaire est au-dessus du gradient
+    zIndex: 1,
   },
   input: {
     height: 50,
-    width: '40%', // Conserver la largeur pour tous les champs
+    width: width * 0.8,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 15,
-    alignSelf: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  passwordInfo: {
+    marginBottom: 10,
+  },
+  passwordInfoText: {
+    color: 'white',
+    fontSize: 12,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
   },
   button: {
-    backgroundColor: 'rgba(255, 69, 0, 0.8)',
+    backgroundColor: '#ffcc00',
     paddingVertical: 15,
     borderRadius: 5,
-    alignItems: 'center',
-    width: '40%',
-    alignSelf: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    marginBottom: 10,
+    width: width * 0.8,
+    alignItems: 'center',  // Centrer le texte dans le bouton
+  },
+  buttonText: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
   },
   signupButton: {
     paddingVertical: 15,
     borderRadius: 5,
-    alignItems: 'center',
-    width: '40%',
-    alignSelf: 'center',
-    marginTop: 15,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    marginBottom: 20,
+    width: width * 0.8,
+    alignItems: 'center',  // Centrer le texte dans le bouton
   },
   signupButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  passwordInfo: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-    alignSelf: 'center',
-    width: '80%',
-  },
-  passwordInfoText: {
-    color: '#000',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 5,
     textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   popup: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -width * 0.15 }, { translateY: -50 }],
-    backgroundColor: 'rgba(255, 69, 0, 0.8)', // Couleur du pop-up (identique au bouton d'inscription)
+    backgroundColor: '#333',
     padding: 20,
     borderRadius: 10,
-    zIndex: 1000,
-    width: '30%', // Largeur du pop-up à 30%
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    borderWidth: 3,
-    borderColor: '#000', // Couleur de la bordure
-    elevation: 10, // Pour Android
+    position: 'absolute',
+    width: width * 0.8,
+    zIndex: 2,
   },
   popupText: {
     color: '#fff',
-    textAlign: 'center',
     marginBottom: 10,
   },
   closeButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: '#ffcc00',
+    padding: 10,
     borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
   },
   closeButtonText: {
     color: '#000',
+    fontWeight: 'bold',
   },
   confirmationButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     width: '100%',
   },
   confirmButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: '#ffcc00',
+    padding: 10,
     borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: 10,
+    width: '45%',  // Ajuster la largeur pour mieux s'adapter
+    alignItems: 'center',  // Centrer le texte dans le bouton
   },
   confirmButtonText: {
     color: '#000',

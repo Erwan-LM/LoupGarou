@@ -20,6 +20,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     backgroundColor: '#1D1D1D', // Couleur de fond sombre
+    width: '100%', // Ajoutez cette ligne
+    position: 'absolute', // Ajoutez cette ligne
+    bottom: 0, // Ajoutez cette ligne
   },
   versionText: {
     color: '#ffcc00', // Couleur de la version
@@ -32,5 +35,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
 });
+
+
 
 export default Footer;
